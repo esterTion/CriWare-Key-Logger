@@ -44,8 +44,11 @@ long* hacked_CriWareDecrypterConfig_ctor(long* a1) {
 {
     @autoreleasepool
     {
-        unsigned long CriWareDecrypterConfig_ctor = _dyld_get_image_vmaddr_slide(0) + 0x100041B68;
-        MSHookFunction((void *)CriWareDecrypterConfig_ctor, (void *)hacked_CriWareDecrypterConfig_ctor, (void **)&orig_CriWareDecrypterConfig_ctor);
+        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: @"/Library/MobileSubstrate/DynamicLibraries/CRIKeyLogger.plist"];
+        if ([[[NSBundle mainBundle] infoDictionary][@"CFBundleIdentifier"] isEqualToString:dict[@"InjectAppID"]]){
+            unsigned long CriWareDecrypterConfig_ctor = _dyld_get_image_vmaddr_slide(0) + [dict[@"InjectFunctionOffset"] longValue];
+            MSHookFunction((void *)CriWareDecrypterConfig_ctor, (void *)hacked_CriWareDecrypterConfig_ctor, (void **)&orig_CriWareDecrypterConfig_ctor);
+        }
     }
 }
 
