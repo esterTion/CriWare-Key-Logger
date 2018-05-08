@@ -27,9 +27,9 @@ long* hacked_CriWareDecrypterConfig_ctor(long* a1) {
             f.numberStyle = NSNumberFormatterDecimalStyle;
             NSNumber *keyNumber = [f numberFromString:key];
             [f release];
-            NSLog(@"[CriWare Key Logger]Key: %@ hex: %0*lX", key, 16, [keyNumber longValue]);
+            NSLog(@"[CriWare Key Logger]Key: %@ hex: %0*llX", key, 16, [keyNumber longLongValue]);
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"CriWare Key Logger" 
-                message:[NSString stringWithFormat:@"Intercepted key: %@\nHex: %0*lX", key, 16, [keyNumber longValue]]
+                message:[NSString stringWithFormat:@"Intercepted key: %@\nHex: %0*llX", key, 16, [keyNumber longLongValue]]
                 delegate:nil 
                 cancelButtonTitle:[[NSBundle bundleWithIdentifier:@"com.apple.UIKit"] localizedStringForKey:@"Dismiss" value:@"" table:nil]
                 otherButtonTitles:nil];
@@ -46,8 +46,16 @@ long* hacked_CriWareDecrypterConfig_ctor(long* a1) {
     {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: @"/Library/MobileSubstrate/DynamicLibraries/CRIKeyLogger.plist"];
         if ([[[NSBundle mainBundle] infoDictionary][@"CFBundleIdentifier"] isEqualToString:dict[@"InjectAppID"]]){
-            unsigned long CriWareDecrypterConfig_ctor = _dyld_get_image_vmaddr_slide(0) + [dict[@"InjectFunctionOffset"] longValue];
-            MSHookFunction((void *)CriWareDecrypterConfig_ctor, (void *)hacked_CriWareDecrypterConfig_ctor, (void **)&orig_CriWareDecrypterConfig_ctor);
+            NSNumber *offset = (NSNumber*)dict[@"InjectFunctionOffset"];
+            unsigned long CriWareDecrypterConfig_ctor = _dyld_get_image_vmaddr_slide(0) + [offset longValue];
+
+            // check instruction F44FBEA9
+            unsigned char *chk = (unsigned char*)CriWareDecrypterConfig_ctor;
+            if (*chk == 0xF4 && *(chk + 1) == 0x4F && *(chk + 2) == 0xBE && *(chk + 3) == 0xA9)
+                MSHookFunction((void *)CriWareDecrypterConfig_ctor, (void *)hacked_CriWareDecrypterConfig_ctor, (void **)&orig_CriWareDecrypterConfig_ctor);
+            else {
+                NSLog(@"[CriWare Key Logger]Specified address 0x%08lx seems not a function, quit injecting", [offset longValue]);
+            }
         }
     }
 }
