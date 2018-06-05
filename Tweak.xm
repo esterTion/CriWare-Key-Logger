@@ -2,7 +2,15 @@
 #import <dlfcn.h>
 #import <mach-o/dyld.h>
 
-
+unsigned long long atoi64(const char *s) {
+	unsigned long long r = 0;
+	while (*s) {
+		if (*s >= '0'&&*s <= '9')r = r * 10 + (*s - '0');
+		else break;
+		s++;
+	}
+	return r;
+}
 
 NSString* CSStringReader(char* stringPtr) {
     int stringLen = *((int*)(*( (long*)stringPtr ) + 0x10));
@@ -23,13 +31,10 @@ long* hacked_CriWareDecrypterConfig_ctor(long* a1) {
         dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 10);
         dispatch_after(delay, dispatch_get_main_queue(), ^(void) {
             NSString *key = CSStringReader(keyPtr);
-            NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
-            f.numberStyle = NSNumberFormatterDecimalStyle;
-            NSNumber *keyNumber = [f numberFromString:key];
-            [f release];
-            NSLog(@"[CriWare Key Logger]Key: %@ hex: %0*llX", key, 16, [keyNumber longLongValue]);
+            unsigned long long keyNumber = atoi64([key cStringUsingEncoding:NSUTF8StringEncoding]);
+            NSLog(@"[CriWare Key Logger]Key: %@ hex: %0*llX", key, 16, keyNumber);
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"CriWare Key Logger" 
-                message:[NSString stringWithFormat:@"Intercepted key: %@\nHex: %0*llX", key, 16, [keyNumber longLongValue]]
+                message:[NSString stringWithFormat:@"Intercepted key: %@\nHex: %08llX %08llX", key, keyNumber >> 32, keyNumber & 0xFFFFFFFFLL]
                 delegate:nil 
                 cancelButtonTitle:[[NSBundle bundleWithIdentifier:@"com.apple.UIKit"] localizedStringForKey:@"Dismiss" value:@"" table:nil]
                 otherButtonTitles:nil];

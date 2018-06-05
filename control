@@ -1,9 +1,10 @@
 Package: com.estertion.crikeylogger
 Name: CRIKeyLogger
 Depends: mobilesubstrate
-Version: 0.0.1
+Version: 3
 Architecture: iphoneos-arm
-Description: An awesome MobileSubstrate tweak!
+Description: Intercept CRIWare media decryption key
+Homepage: https://github.com/esterTion/CriWare-Key-Logger
 Maintainer: esterTion
 Author: esterTion
 Section: Tweaks
