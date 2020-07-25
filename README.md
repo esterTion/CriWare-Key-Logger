@@ -1,3 +1,10 @@
+### Better method of extracting
+https://estertion.win/media/bandicam%202019-10-29%2013-39-41-080.mp4  
+Open `resources.assetes`, search `CRIWareInitializer`, select Managed(non-il2cpp) / generated DummyDll(il2cpp dumper) folder
+
+
+
+
 ## CriWare key logger
 > iOS tweak, package at [com.estertion.crikeylogger_3_iphoneos-arm.deb](raw/master/com.estertion.crikeylogger_3_iphoneos-arm.deb) or [https://repo.estertion.win/](https://repo.estertion.win/)
 
